@@ -16,7 +16,7 @@ pub struct AppState {
     pub signing_key: String,
     pub base_url: String,
     pub database: DataBase,
-    pub weak_auth: String
+    pub weak_auth: String,
 }
 
 #[derive(Clone)]
@@ -41,7 +41,7 @@ struct JsonConfig {
     signing_key_path: String,
     signature_folder: String,
     base_url: String,
-    weak_auth: String
+    weak_auth: String,
 }
 
 impl AppState {
@@ -83,7 +83,7 @@ impl AppState {
             signing_key: signing_key,
             base_url: config.base_url,
             database,
-            weak_auth: config.weak_auth
+            weak_auth: config.weak_auth,
         };
         Ok(result)
     }

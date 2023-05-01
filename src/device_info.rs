@@ -4,9 +4,9 @@ use serde::Deserialize;
 pub struct HostInfo {
     pub os_name: String,
     pub os_version: String,
-    pub host_cpid: String
+    pub host_cpid: String,
 }
 
 pub struct DeviceInfo {
-    pub host_info: HostInfo
+    pub host_info: HostInfo,
 }

@@ -10,4 +10,4 @@ mod device_info;
 pub use device_info::DeviceInfo;
 
 mod database;
-pub use database::{DataBase, AppVersion};
+pub use database::{AppVersion, DataBase};

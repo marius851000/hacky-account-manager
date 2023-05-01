@@ -1,7 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use actix_web::{
-    http::{StatusCode},
+    http::StatusCode,
     post,
     web::{self, Data},
     HttpRequest, HttpResponse, HttpResponseBuilder,
@@ -9,7 +9,7 @@ use actix_web::{
 use awc::Client;
 use serde::Deserialize;
 
-use crate::{AppState, database::WorkUnit, AppVersion, device_info::HostInfo};
+use crate::{database::WorkUnit, device_info::HostInfo, AppState, AppVersion};
 
 #[derive(Deserialize, Debug)]
 pub struct SchedulerWorkUnit {
@@ -36,7 +36,7 @@ pub struct SchedulerResult {
     name: String,
     platform: String,
     version_num: u64,
-    plan_class: String
+    plan_class: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -51,8 +51,7 @@ pub struct SchedulerAppVersion {
     version_num: u64,
     platform: String,
     #[serde(default)]
-    plan_class: String
-
+    plan_class: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -70,14 +69,14 @@ pub struct SchedulerReply {
 #[derive(Deserialize, Debug)]
 pub struct ResultQuery {
     name: String,
-    state: u64
+    state: u64,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct Query {
     #[serde(default)]
     result: Vec<ResultQuery>,
-    host_info: HostInfo
+    host_info: HostInfo,
 }
 
 #[post("/proxy/{project_id}/scheduler")]
@@ -104,7 +103,10 @@ pub async fn proxy_scheduler_route(
 
     let query_analyzed: Query = quick_xml::de::from_str(&source_body).unwrap();
     for result in &query_analyzed.result {
-        app_state.database.update_status(&project_id, &result.name, result.state).unwrap();
+        app_state
+            .database
+            .update_status(&project_id, &result.name, result.state)
+            .unwrap();
     }
     //debug!("{:?}", query_analyzed);
 
@@ -123,9 +125,8 @@ pub async fn proxy_scheduler_route(
 
     if res.status() == StatusCode::OK {
         let result_string = String::from_utf8_lossy(&result_body).replace("&", "&amp;"); // The server doesn’t seems to escape it, which is invalid XML!!
-        let result: SchedulerReply =
-            quick_xml::de::from_str(&result_string).unwrap();
-        
+        let result: SchedulerReply = quick_xml::de::from_str(&result_string).unwrap();
+
         for workunit in &result.workunit {
             for res in &result.result {
                 if res.wu_name == workunit.name {
@@ -143,7 +144,10 @@ pub async fn proxy_scheduler_route(
                         version_num: res.version_num,
                         plan_class: res.plan_class.to_string(),
                         result_name: res.name.to_string(),
-                        timestamp: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
+                        timestamp: SystemTime::now()
+                            .duration_since(UNIX_EPOCH)
+                            .unwrap()
+                            .as_secs(),
                     };
                     app_state.database.add_work_unit(&merged_wu).unwrap();
                     break;
@@ -151,7 +155,6 @@ pub async fn proxy_scheduler_route(
             }
         }
 
-        
         for app_version in &result.app_version {
             for app in &result.app {
                 if app.name == app_version.app_name {
@@ -161,7 +164,7 @@ pub async fn proxy_scheduler_route(
                         user_friendly_name: app.user_friendly_name.clone(),
                         version: app_version.version_num,
                         platform: app_version.platform.clone(),
-                        plan_class: app_version.plan_class.clone()
+                        plan_class: app_version.plan_class.clone(),
                     };
                     app_state.database.add_app_version(&merged_app).unwrap();
                     break;

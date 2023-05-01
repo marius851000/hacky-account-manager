@@ -1,6 +1,9 @@
-use crate::{boinc_api::xml_to_response, planify_action, AppState, DeviceInfo, PlanificatorResult, device_info::HostInfo};
+use crate::{
+    boinc_api::xml_to_response, device_info::HostInfo, planify_action, AppState, DeviceInfo,
+    PlanificatorResult,
+};
 use actix_web::{post, web::Data, HttpResponse, Result};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct RpcAccount {
@@ -8,7 +11,7 @@ pub struct RpcAccount {
     url_signature: String,
     authenticator: String,
     resource_share: u16,
-    detach: u8
+    detach: u8,
 }
 
 #[derive(Serialize)]
@@ -48,9 +51,8 @@ impl RpcResponse {
 #[derive(Deserialize)]
 pub struct RpcQuery {
     name: String,
-    host_info: HostInfo
+    host_info: HostInfo,
 }
-
 
 #[post("/rpc.php")]
 pub async fn rpc_endpoint(post: String, app_state: Data<AppState>) -> Result<HttpResponse> {
@@ -58,9 +60,12 @@ pub async fn rpc_endpoint(post: String, app_state: Data<AppState>) -> Result<Htt
     if rpc_query.name != app_state.weak_auth {
         return Ok(HttpResponse::Forbidden().body("Invalid name"));
     }
-    let plan_result = planify_action(&app_state, &DeviceInfo {
-        host_info: rpc_query.host_info
-    });
+    let plan_result = planify_action(
+        &app_state,
+        &DeviceInfo {
+            host_info: rpc_query.host_info,
+        },
+    );
     let result = RpcResponse::new_from_planificator_result(&app_state, &plan_result)?;
 
     xml_to_response(result, "acct_mgr_reply")
