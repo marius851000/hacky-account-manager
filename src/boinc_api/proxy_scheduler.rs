@@ -8,6 +8,7 @@ use actix_web::{
 };
 use awc::Client;
 use serde::Deserialize;
+use log::debug;
 
 use crate::{database::WorkUnit, device_info::HostInfo, AppState, AppVersion};
 
