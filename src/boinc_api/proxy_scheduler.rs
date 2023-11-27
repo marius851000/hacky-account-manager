@@ -79,6 +79,7 @@ pub struct Query {
     host_info: HostInfo,
 }
 
+//TODO: check authentification
 #[post("/proxy/{project_id}/scheduler")]
 pub async fn proxy_scheduler_route(
     request: HttpRequest,
@@ -86,8 +87,8 @@ pub async fn proxy_scheduler_route(
     path: web::Path<String>,
     app_state: Data<AppState>,
 ) -> HttpResponse {
-    //TODO: convert all error to boinc-readable error (except 404)
-    //info!("source:\n{}", source_body);
+    //TODO: convert all error to boinc-readable error (except 404 maybe)
+    debug!("source:\n{}", source_body);
     let project_id = path.into_inner();
     let project = if let Some(v) = app_state.projects.get(&project_id) {
         v
@@ -108,7 +109,7 @@ pub async fn proxy_scheduler_route(
             .update_status(&project_id, &result.name, result.state)
             .unwrap();
     }
-    //debug!("{:?}", query_analyzed);
+    debug!("{:?}", query_analyzed);
 
     //TODO: get rid of unwrap
     let mut res = Client::default()
