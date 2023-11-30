@@ -123,7 +123,7 @@ pub async fn proxy_scheduler_route(
     //TODO: avoid unwrap
     let result_body = res.body().await.unwrap();
 
-    //info!("result\n{:?}", result_body);
+    debug!("result\n{:?}", result_body);
 
     if res.status() == StatusCode::OK {
         let result_string = String::from_utf8_lossy(&result_body).replace("&", "&amp;"); // The server doesn’t seems to escape it, which is invalid XML!!
