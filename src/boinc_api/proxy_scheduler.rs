@@ -120,7 +120,7 @@ pub async fn proxy_scheduler_route(
         .await
         .unwrap();
 
-    //TODO: avoid unwrap
+    //TODO: avoid unwraping
     let result_body = res.body().await.unwrap();
 
     debug!("result\n{:?}", result_body);
